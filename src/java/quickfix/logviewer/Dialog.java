@@ -18,42 +18,36 @@
 ****************************************************************************/
 
 package quickfix.logviewer;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
 
-import javax.swing.UIManager;
+import java.awt.HeadlessException;
+import java.awt.Rectangle;
 
-import quickfix.DataDictionary;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
-public class Main {
+public class Dialog extends JDialog {
 
-	static {
-		TimeZone.setDefault( new SimpleTimeZone(SimpleTimeZone.UTC_TIME,"GMT") );
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public Dialog(JFrame owner, String label) throws HeadlessException {
+		super(owner, label, true);
+		
+		setSize( 640, 480 );
 	}
 	
-	public static void main( String[] args ) throws Exception {
+	public void setSize( int width, int height ) {
+		super.setSize( width, height );
+		Rectangle ownerBounds = this.getOwner().getBounds();
+		Rectangle bounds = getBounds();
 		
-		/*if( args.length != 1 ) {
-			System.out.println( "Usage: " + "FIXLogViewer dictionary");
-			return;
-		}
-				
-		String dictionaryFileName = args[0];
-		*/
-		String dictionaryFileName = "FIX44.xml";
-		
-		if (args.length > 0 ) 
-			dictionaryFileName = args[0];
-		
-		DataDictionary dataDictionary =
-			new DataDictionary( dictionaryFileName );
-		
-		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-		} catch( Exception e ) {
-		}
-		
-		Frame frame = new Frame( dataDictionary );
-		frame.setVisible( true );
- 	}
+		int w = bounds.getSize().width;
+		int h = bounds.getSize().height;
+		int x = ((ownerBounds.getSize().width-w)/2) + ownerBounds.x;
+		int y = ((ownerBounds.getSize().height-h)/2) + ownerBounds.y;
+		     
+		setBounds(x, y, w, h);
+	}
 }

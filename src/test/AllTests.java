@@ -17,43 +17,26 @@
 **
 ****************************************************************************/
 
-package quickfix.logviewer;
+package quickfix.logviewer.test;
+
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
-import javax.swing.UIManager;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-import quickfix.DataDictionary;
-
-public class Main {
-
+public class AllTests {
+	
 	static {
 		TimeZone.setDefault( new SimpleTimeZone(SimpleTimeZone.UTC_TIME,"GMT") );
 	}
 	
-	public static void main( String[] args ) throws Exception {
-		
-		/*if( args.length != 1 ) {
-			System.out.println( "Usage: " + "FIXLogViewer dictionary");
-			return;
-		}
-				
-		String dictionaryFileName = args[0];
-		*/
-		String dictionaryFileName = "FIX44.xml";
-		
-		if (args.length > 0 ) 
-			dictionaryFileName = args[0];
-		
-		DataDictionary dataDictionary =
-			new DataDictionary( dictionaryFileName );
-		
-		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-		} catch( Exception e ) {
-		}
-		
-		Frame frame = new Frame( dataDictionary );
-		frame.setVisible( true );
- 	}
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Test for quickfix.logviewer.test");
+		//$JUnit-BEGIN$
+		suite.addTestSuite(LogFileTestCase.class);
+		suite.addTestSuite(MessagesTableModelTestCase.class);
+		//$JUnit-END$
+		return suite;
+	}
 }
