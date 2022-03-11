@@ -119,7 +119,7 @@ public class LogFile {
 		return line.charAt(9);
 	}
 
-	public ArrayList<Message> parseMessages(ProgressBarPanel progressBar, int startingPosition, int endingPosition)
+	public ArrayList<Message>  parseMessages(ProgressBarPanel progressBar, int startingPosition, int endingPosition)
 			throws IOException, CancelException {
 		initialize();
 		messages = new ArrayList<Message>();
@@ -162,34 +162,42 @@ public class LogFile {
 		return messages;
 	}
 
-	public ArrayList<Message> parseMessages(ProgressBarPanel progressBar, Date startTime, Date endTime)
+	public ArrayList<Message>  parseMessages(ProgressBarPanel progressBar, Date startTime, Date endTime)
 			throws IOException, CancelException {
 		int startingPosition = findPositionByTime(progressBar, startTime, 0, true);
 		int endingPosition = (int) logFile.length();
 		if (endTime != null)
 			endingPosition = findPositionByTime(progressBar, endTime, startingPosition, false);
 
-		ArrayList<Message> messages = parseMessages(progressBar, startingPosition, endingPosition);
+		ArrayList<Message>  messages = parseMessages(progressBar, startingPosition, endingPosition);
 		return trimMessages(messages, startTime, endTime);
 	}
 
-	public ArrayList<Message> parseNewMessages(ProgressBarPanel progressBar) throws IOException, CancelException {
+	public ArrayList<Message>  parseNewMessages(ProgressBarPanel progressBar) throws IOException, CancelException {
 		int startingPosition = lastPosition;
 		int endingPosition = (int) logFile.length();
 
-		ArrayList<Message> messages = parseMessages(progressBar, startingPosition, endingPosition);
+		ArrayList<Message>  messages = parseMessages(progressBar, startingPosition, endingPosition);
 		return messages;
 	}
 
-	private ArrayList<Message> trimMessages(ArrayList<Message> messages, Date startTime, Date endTime) {
+	private ArrayList<Message>  trimMessages(ArrayList <Message> messages, Date startTime, Date endTime) {
 		SendingTime sendingTime = new SendingTime();
-		LocalDateTime st = LocalDateTime.MIN;
-		LocalDateTime et = LocalDateTime.MAX;
-		if (startTime != null)
-			st = startTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-		if (endTime != null)
-			et = endTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-		while (messages.size() > 0) {
+		LocalDateTime et = null;
+		LocalDateTime st = null;
+		
+		if (startTime != null) {
+		 st = startTime.toInstant()
+			      .atZone(ZoneId.systemDefault())
+			      .toLocalDateTime();
+
+		}
+		if (endTime != null ) {
+		 et = endTime.toInstant()
+			      .atZone(ZoneId.systemDefault())
+			      .toLocalDateTime();
+		}
+		while (startTime != null && messages.size() > 0) {
 			Message message = (Message) messages.get(0);
 			try {
 				message.getHeader().getField(sendingTime);
@@ -204,7 +212,7 @@ public class LogFile {
 			}
 		}
 
-		while (messages.size() > 0) {
+		while (endTime != null && messages.size() > 0) {
 			Message message = (Message) messages.get(messages.size() - 1);
 			try {
 				message.getHeader().getField(sendingTime);
@@ -231,10 +239,12 @@ public class LogFile {
 			progressBar.setTask("Scanning Dates", 0, lastPosition = (int) logFile.length(), true);
 			progressBar.setValue(position);
 		}
-
-		LocalDateTime t = LocalDateTime.MIN;
-		if (time != null) {
-			t = time.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		
+		LocalDateTime t = LocalDateTime.MAX; 
+		if (time != null) {		
+			t=time.toInstant()
+			      .atZone(ZoneId.systemDefault())
+			      .toLocalDateTime();
 		}
 		try {
 			if (position == 0)
