@@ -27,6 +27,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import quickfix.DataDictionary;
+import quickfix.Field;
 import quickfix.Group;
 import quickfix.IntField;
 import quickfix.Message;
@@ -39,14 +40,14 @@ public class MessageTreeModel implements TreeModel {
 	private String trailer = new String("Trailer");
 
 	public class Node {
-		private StringField field = null;
+		private Field<?> field = null;
 		private ArrayList<Node> children = new ArrayList<Node>();
 
-		Node(StringField aField) {
+		Node(Field<?> aField) {
 			field = aField;
 		}
 
-		public StringField getField() {
+		public Field<?> getField() {
 			return field;
 		}
 
@@ -62,12 +63,12 @@ public class MessageTreeModel implements TreeModel {
 			Integer tag = Integer.valueOf(field.getField());
 			String result = new String();
 			result = dataDictionary.getFieldName(tag.intValue()) + " (" + field.getField() + ")" + " = ";
-
+				
 			if (dataDictionary.hasFieldValue(tag.intValue())) {
-				String value = dataDictionary.getValueName(tag.intValue(), field.getValue());
+				String value = dataDictionary.getValueName(tag.intValue(), field.getObject().toString());
 				result += field.getObject().toString();
 				if (value != null)
-					result += " (" + dataDictionary.getValueName(tag.intValue(), field.getValue()) + ")";
+					result += " (" + dataDictionary.getValueName(tag.intValue(), field.getObject().toString()) + ")";
 			} else {
 				result += field.getObject().toString();
 			}
@@ -113,10 +114,9 @@ public class MessageTreeModel implements TreeModel {
 	}
 
 	void addGroups(Message message, Node node) {
-		@SuppressWarnings("unchecked")
-		Iterator <StringField>i = message.iterator();
+		Iterator <Field<?>>i = message.iterator();
 		while (i.hasNext()) {
-			StringField field = (StringField) i.next();
+			Field<?> field = i.next();
 			try {
 				Group group = new Group(field.getField(), 1);
 				IntField integerField = new IntField(field.getField());
@@ -124,10 +124,9 @@ public class MessageTreeModel implements TreeModel {
 				for (int count = 1; count <= integerField.getValue(); ++count) {
 					message.getGroup(count, group);
 					Node firstNode = null;
-					@SuppressWarnings("unchecked")
-					Iterator<StringField> j = group.iterator();
+					Iterator <Field<?>> j = group.iterator();
 					while (j.hasNext()) {
-						field = (StringField) j.next();
+						field =  j.next();
 						if (firstNode == null) {
 							firstNode = new Node(field);
 							continue;

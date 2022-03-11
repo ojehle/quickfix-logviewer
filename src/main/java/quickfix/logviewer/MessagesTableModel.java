@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import javax.swing.table.AbstractTableModel;
 
 import quickfix.DataDictionary;
+import quickfix.Field;
 import quickfix.FieldMap;
 import quickfix.FieldNotFound;
 import quickfix.Message;
@@ -190,10 +191,10 @@ public class MessagesTableModel extends AbstractTableModel {
 	}
 
 	private void fillTagSet(FieldMap fieldMap, SortedSet<Integer> tagSet) {
-		@SuppressWarnings("unchecked")
-		Iterator<StringField> i = fieldMap.iterator();
+
+		Iterator<Field<?>> i = fieldMap.iterator();
 		while (i.hasNext()) {
-			StringField field = (StringField) i.next();
+			Field<?> field = i.next();
 			tagSet.add(Integer.valueOf(field.getField()));
 		}
 	}
@@ -281,7 +282,8 @@ public class MessagesTableModel extends AbstractTableModel {
 					int compareResults = 0;
 					String value1 = field.getValue();
 					String value2 = fieldFilter.getValue();
-					int fieldType = dataDictionary.getFieldType(tag);
+			
+					int fieldType = dataDictionary.getFieldType(tag).ordinal();
 
 					switch (fieldType) {
 					// doubles

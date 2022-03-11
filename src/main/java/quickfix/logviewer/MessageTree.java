@@ -23,7 +23,8 @@ import java.awt.Point;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
-import quickfix.StringField;
+import quickfix.Field;
+
 
 public class MessageTree extends JTree {
 
@@ -73,7 +74,7 @@ public class MessageTree extends JTree {
 		firstModel = false;
 	}
 	
-	public StringField getFieldFromPoint( Point point ) {
+	public Field<?> getFieldFromPoint( Point point ) {
 		MessageTreeModel tm = (MessageTreeModel)getModel();
 		int row = getRowForLocation( (int)point.getX(), (int)point.getY() );
 		TreePath path = getPathForLocation( (int)point.getX(), (int)point.getY() );
@@ -89,14 +90,14 @@ public class MessageTree extends JTree {
 	}
 	
 	public Integer getTagFromPoint( Point point ) {
-		StringField field = getFieldFromPoint( point );
+		Field<?> field = getFieldFromPoint( point );
 		if( field == null ) return null;
 		return Integer.valueOf(field.getField());
     }
     
     public String getValueFromPoint( Point point ) {
-		StringField field = getFieldFromPoint( point );
+    	Field<?>  field = getFieldFromPoint( point );
 		if( field == null ) return null;
-		return field.getValue();
+		return field.getObject().toString();
     }
 }

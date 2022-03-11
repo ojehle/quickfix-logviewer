@@ -24,6 +24,7 @@ import java.util.Iterator;
 import javax.swing.table.AbstractTableModel;
 
 import quickfix.DataDictionary;
+import quickfix.Field;
 import quickfix.FieldMap;
 import quickfix.Group;
 import quickfix.IntField;
@@ -35,7 +36,7 @@ public class MessageTableModel extends AbstractTableModel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private HashMap<Integer,StringField> rowToField = new HashMap<Integer,StringField>();
+	private HashMap<Integer,Field<?>> rowToField = new HashMap<Integer,Field<?>>();
 	private HashMap<Integer,Integer> rowToDepth = new HashMap<Integer,Integer> ();
 	private Message message = null;
 	private DataDictionary dataDictionary = null;
@@ -63,17 +64,16 @@ public class MessageTableModel extends AbstractTableModel {
 	}
 	
 	private void insertFieldMap(FieldMap fieldMap, int depth) {
-		@SuppressWarnings("unchecked")
-		Iterator<StringField> i = fieldMap.iterator();
+		Iterator<Field<?>> i = fieldMap.iterator();
 		while( i.hasNext() ) {
-			StringField field = (StringField)i.next();
+			Field<?> field = i.next();
 			rowToField.put( Integer.valueOf(rowCount), field );
 			rowToDepth.put( Integer.valueOf(rowCount++), Integer.valueOf(depth) );
 			insertGroup( message, field );
 		}
 	}
 	
-	private void insertGroup(Message message, StringField field) {
+	private void insertGroup(Message message, Field<?> field) {
 		depth += 1;
 		if( depth > groupDepth )
 			groupDepth = depth;

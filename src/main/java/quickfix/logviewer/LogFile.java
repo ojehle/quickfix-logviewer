@@ -26,6 +26,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -117,7 +119,7 @@ public class LogFile {
 		return line.charAt(9);
 	}
 
-	public ArrayList<Message>  parseMessages(ProgressBarPanel progressBar, int startingPosition, int endingPosition)
+	public ArrayList<Message> parseMessages(ProgressBarPanel progressBar, int startingPosition, int endingPosition)
 			throws IOException, CancelException {
 		initialize();
 		messages = new ArrayList<Message>();
@@ -160,33 +162,38 @@ public class LogFile {
 		return messages;
 	}
 
-	public ArrayList<Message>  parseMessages(ProgressBarPanel progressBar, Date startTime, Date endTime)
+	public ArrayList<Message> parseMessages(ProgressBarPanel progressBar, Date startTime, Date endTime)
 			throws IOException, CancelException {
 		int startingPosition = findPositionByTime(progressBar, startTime, 0, true);
 		int endingPosition = (int) logFile.length();
 		if (endTime != null)
 			endingPosition = findPositionByTime(progressBar, endTime, startingPosition, false);
 
-		ArrayList<Message>  messages = parseMessages(progressBar, startingPosition, endingPosition);
+		ArrayList<Message> messages = parseMessages(progressBar, startingPosition, endingPosition);
 		return trimMessages(messages, startTime, endTime);
 	}
 
-	public ArrayList<Message>  parseNewMessages(ProgressBarPanel progressBar) throws IOException, CancelException {
+	public ArrayList<Message> parseNewMessages(ProgressBarPanel progressBar) throws IOException, CancelException {
 		int startingPosition = lastPosition;
 		int endingPosition = (int) logFile.length();
 
-		ArrayList<Message>  messages = parseMessages(progressBar, startingPosition, endingPosition);
+		ArrayList<Message> messages = parseMessages(progressBar, startingPosition, endingPosition);
 		return messages;
 	}
 
-	private ArrayList<Message>  trimMessages(ArrayList <Message> messages, Date startTime, Date endTime) {
+	private ArrayList<Message> trimMessages(ArrayList<Message> messages, Date startTime, Date endTime) {
 		SendingTime sendingTime = new SendingTime();
-
-		while (startTime != null && messages.size() > 0) {
+		LocalDateTime st = LocalDateTime.MIN;
+		LocalDateTime et = LocalDateTime.MAX;
+		if (startTime != null)
+			st = startTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		if (endTime != null)
+			et = endTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		while (messages.size() > 0) {
 			Message message = (Message) messages.get(0);
 			try {
 				message.getHeader().getField(sendingTime);
-				if (startTime.compareTo(sendingTime.getValue()) > 0) {
+				if (st.compareTo(sendingTime.getValue()) > 0) {
 					messages.remove(0);
 				} else {
 					break;
@@ -197,11 +204,11 @@ public class LogFile {
 			}
 		}
 
-		while (endTime != null && messages.size() > 0) {
+		while (messages.size() > 0) {
 			Message message = (Message) messages.get(messages.size() - 1);
 			try {
 				message.getHeader().getField(sendingTime);
-				if (endTime.compareTo(sendingTime.getValue()) < 0) {
+				if (et.compareTo(sendingTime.getValue()) < 0) {
 					messages.remove(messages.size() - 1);
 				} else {
 					break;
@@ -225,6 +232,10 @@ public class LogFile {
 			progressBar.setValue(position);
 		}
 
+		LocalDateTime t = LocalDateTime.MIN;
+		if (time != null) {
+			t = time.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		}
 		try {
 			if (position == 0)
 				initialize();
@@ -249,7 +260,7 @@ public class LogFile {
 							lastMessageWasBad = true;
 						}
 
-						if (time.compareTo(sendingTime.getValue()) < 0) {
+						if (t.compareTo(sendingTime.getValue()) < 0) {
 							break;
 						}
 
