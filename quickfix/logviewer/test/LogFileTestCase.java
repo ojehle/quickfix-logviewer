@@ -25,9 +25,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import quickfix.DataDictionary;
-import quickfix.logviewer.LogFile;
 import junit.framework.TestCase;
+import quickfix.DataDictionary;
+import quickfix.Message;
+import quickfix.logviewer.LogFile;
 
 public class LogFileTestCase extends TestCase {
 	private DataDictionary dataDictionary = null;
@@ -39,7 +40,7 @@ public class LogFileTestCase extends TestCase {
 	public void testLoadFile() throws Exception {
 
 		LogFile logFile = new LogFile( "test.log", dataDictionary );
-		ArrayList messages = logFile.parseMessages( null, null, null );
+		ArrayList<Message> messages = logFile.parseMessages( null, null, null );
 		assertEquals( 22, messages.size() );
 		assertEquals( 0, logFile.getInvalidMessages().size() );
 
@@ -90,7 +91,7 @@ public class LogFileTestCase extends TestCase {
 	
 	public void testDetermineDelimiter() throws Exception {
 		LogFile logFile = new LogFile( "test.log", dataDictionary );
-		ArrayList messages = logFile.parseMessages( null, null, null );
+		ArrayList<Message> messages = logFile.parseMessages( null, null, null );
 		assertEquals( 22, messages.size() );
 		assertEquals( 0, logFile.getInvalidMessages().size() );
 		assertEquals( '\001', logFile.getDelimiter() );

@@ -91,7 +91,7 @@ public class MessageTree extends JTree {
 	public Integer getTagFromPoint( Point point ) {
 		StringField field = getFieldFromPoint( point );
 		if( field == null ) return null;
-		return new Integer(field.getField());
+		return Integer.valueOf(field.getField());
     }
     
     public String getValueFromPoint( Point point ) {

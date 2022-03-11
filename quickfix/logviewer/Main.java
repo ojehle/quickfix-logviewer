@@ -18,12 +18,12 @@
 ****************************************************************************/
 
 package quickfix.logviewer;
-import quickfix.*;
-
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 import javax.swing.UIManager;
+
+import quickfix.DataDictionary;
 
 public class Main {
 

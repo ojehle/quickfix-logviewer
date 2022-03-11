@@ -27,6 +27,11 @@ import javax.swing.JFrame;
 
 public class Dialog extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public Dialog(JFrame owner, String label) throws HeadlessException {
 		super(owner, label, true);
 		

@@ -25,7 +25,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,6 +45,10 @@ import quickfix.StringField;
 public class SplitPane extends JSplitPane 
 	implements ListSelectionListener, ActionListener, MouseListener, ChangeListener {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Frame frame = null;
 	private MenuBar menuBar = null;
 	private ProgressBarPanel progressBar = null;
@@ -199,7 +202,7 @@ public class SplitPane extends JSplitPane
 		if( file != null ) {
 			try {
 				LogFile logFile = new LogFile( file, dataDictionary );
-				ArrayList messages = logFile.parseMessages( progressBar, startTime, endTime );
+				ArrayList<Message>messages = logFile.parseMessages( progressBar, startTime, endTime );
 				currentModel = new MessagesTableModel( dataDictionary, logFile );
 				currentTable = new MessagesTable( currentModel );
 				currentTable.addListSelectionListener( this );
@@ -258,7 +261,8 @@ public class SplitPane extends JSplitPane
 			return false;
 		
 		boolean result = false;
-		ArrayList filter = (ArrayList)currentModel.getFilter().clone();
+		@SuppressWarnings("unchecked")
+		ArrayList<FieldFilter> filter = (ArrayList<FieldFilter>)currentModel.getFilter().clone();
 		if( fieldFilter != null )
 			filter.add( fieldFilter );
 		
@@ -298,7 +302,7 @@ public class SplitPane extends JSplitPane
 			LogFile logFile = model.getLogFile();
 			if( logFile == null ) continue;
 			try {
-				ArrayList messages = logFile.parseNewMessages( null );
+				ArrayList<Message> messages = logFile.parseNewMessages( null );
 				model.addMessages( messages, null );
 			} catch (IOException e) {				
 			} catch (CancelException e) {				

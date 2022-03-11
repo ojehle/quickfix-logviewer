@@ -21,8 +21,8 @@ package quickfix.logviewer;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Panel;
 import java.awt.HeadlessException;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -30,6 +30,10 @@ import javax.swing.JButton;
 
 public class ProgressBarPanel extends Panel implements ActionListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ProgressBar progressBar = null;
 	private JButton cancelButton = new JButton("Cancel");
 	private boolean cancelled = false;

@@ -22,11 +22,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.table.AbstractTableModel;
-import quickfix.*;
+
+import quickfix.DataDictionary;
+import quickfix.FieldMap;
+import quickfix.Group;
+import quickfix.IntField;
+import quickfix.Message;
+import quickfix.StringField;
 
 public class MessageTableModel extends AbstractTableModel {
-	private HashMap rowToField = new HashMap();
-	private HashMap rowToDepth = new HashMap();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private HashMap<Integer,StringField> rowToField = new HashMap<Integer,StringField>();
+	private HashMap<Integer,Integer> rowToDepth = new HashMap<Integer,Integer> ();
 	private Message message = null;
 	private DataDictionary dataDictionary = null;
 	private int rowCount = 0;
@@ -53,11 +63,12 @@ public class MessageTableModel extends AbstractTableModel {
 	}
 	
 	private void insertFieldMap(FieldMap fieldMap, int depth) {
-		Iterator i = fieldMap.iterator();
+		@SuppressWarnings("unchecked")
+		Iterator<StringField> i = fieldMap.iterator();
 		while( i.hasNext() ) {
 			StringField field = (StringField)i.next();
-			rowToField.put( new Integer(rowCount), field );
-			rowToDepth.put( new Integer(rowCount++), new Integer(depth) );
+			rowToField.put( Integer.valueOf(rowCount), field );
+			rowToDepth.put( Integer.valueOf(rowCount++), Integer.valueOf(depth) );
 			insertGroup( message, field );
 		}
 	}
@@ -82,8 +93,8 @@ public class MessageTableModel extends AbstractTableModel {
 	}
 	
 	private void insertBlank() {
-		rowToField.put( new Integer(rowCount), null );
-		rowToDepth.put( new Integer(rowCount++), null );
+		rowToField.put( Integer.valueOf(rowCount), null );
+		rowToDepth.put( Integer.valueOf(rowCount++), null );
 	}
 
 	public int getRowCount() {
@@ -95,8 +106,8 @@ public class MessageTableModel extends AbstractTableModel {
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		StringField field = (StringField) rowToField.get( new Integer(rowIndex) );
-		Integer depth = (Integer) rowToDepth.get( new Integer(rowIndex) );
+		StringField field = (StringField) rowToField.get( Integer.valueOf(rowIndex) );
+		Integer depth = (Integer) rowToDepth.get( Integer.valueOf(rowIndex) );
 		
 		if( field == null )
 			return "";
@@ -104,7 +115,7 @@ public class MessageTableModel extends AbstractTableModel {
 			return " -> ";
 		columnIndex -= depth.intValue();
 		
-		Integer tag = new Integer(field.getField());
+		Integer tag = Integer.valueOf(field.getField());
 		switch( columnIndex ) {
 			case 0: return tag.toString();
 			case 1: return dataDictionary.getFieldName(tag.intValue());
@@ -115,6 +126,7 @@ public class MessageTableModel extends AbstractTableModel {
 		}
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Class getColumnClass(int columnIndex) {
 		return String.class;
 	}

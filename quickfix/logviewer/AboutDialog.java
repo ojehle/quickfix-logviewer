@@ -19,14 +19,19 @@
 
 package quickfix.logviewer;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 public class AboutDialog extends Dialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private GridBagConstraints constraints = new GridBagConstraints();
 	
 	AboutDialog(JFrame owner) {

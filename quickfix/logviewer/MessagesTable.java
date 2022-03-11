@@ -18,16 +18,29 @@
 ****************************************************************************/
 
 package quickfix.logviewer;
-import javax.swing.table.*;
-import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelListener;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FontMetrics;
+import java.awt.Point;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+
 public class MessagesTable extends JTable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public MessagesTable(TableModel dm) {
 		super(dm);
@@ -71,7 +84,7 @@ public class MessagesTable extends JTable {
 		autoSizeHeaders();
 		
 		boolean columnIsEmpty = true;
-		HashSet emptyColumns = new HashSet();
+		HashSet<TableColumn> emptyColumns = new HashSet<TableColumn>();
 
 		for( int column = 0; column < columns; ++column, columnIsEmpty = true ) {
 			TableColumn tableColumn = getColumnModel().getColumn(column);
@@ -98,7 +111,7 @@ public class MessagesTable extends JTable {
 		}
 
 		if( sample == 1 ) {
-			Iterator i = emptyColumns.iterator();
+			Iterator<TableColumn> i = emptyColumns.iterator();
 			while( i.hasNext() ) {
 				final TableColumn tableColumn = (TableColumn)i.next();
 				Runnable runnable = new Runnable() {

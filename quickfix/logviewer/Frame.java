@@ -28,6 +28,11 @@ import quickfix.DataDictionary;
 
 public class Frame extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public Frame( DataDictionary dataDictionary ) throws HeadlessException {
 		super();		
 		

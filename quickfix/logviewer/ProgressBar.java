@@ -24,6 +24,11 @@ import javax.swing.SwingUtilities;
 
 public class ProgressBar extends JProgressBar {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public ProgressBar() {
 		super();
 		paintString = true;

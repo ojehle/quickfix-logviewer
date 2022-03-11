@@ -20,14 +20,6 @@
 
 package quickfix.logviewer;
 
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
-
-import quickfix.DataDictionary;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -38,9 +30,20 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Calendar;
 import java.util.Date;
 
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
+
 public class FileOpenDialog extends Dialog implements ActionListener, PropertyChangeListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JFileChooser fileChooser = new JFileChooser();
 	private JLabel label = new JLabel("Time Range");
 	private JSpinner startTimeControl = null;
@@ -164,19 +167,30 @@ public class FileOpenDialog extends Dialog implements ActionListener, PropertyCh
 		} catch (FileNotFoundException e1) {
 		}
 	}
+	
+	
 
 	public Date roundDate( Date date, boolean roundDown ) {
 		if( date == null ) return date;
+		int  min , sec;
+		
 		long time = date.getTime();
 		long diff = (time % 1000);
 		if( diff != 0 ) diff = 1000 - diff;
 		time += diff;
 		date.setTime( time );
 		
-		if( date.getMinutes() == 0 || date.getSeconds() == 0 )
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		min = calendar.get(Calendar.MINUTE);
+		sec = calendar.get(Calendar.SECOND);
+		
+		
+		if( min == 0 || sec == 0 )
 			return date;
-		date.setMinutes( 0 );
-		date.setSeconds( 0 );
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		date = calendar.getTime();
 		
 		if( roundDown == false )
 			date.setTime( date.getTime() + 1000 * 60 * 60 );

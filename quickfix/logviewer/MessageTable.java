@@ -32,6 +32,11 @@ import quickfix.DataDictionary;
 
 public class MessageTable extends JTable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public MessageTable() {
 		setAutoResizeMode( AUTO_RESIZE_OFF );
 		setShowGrid( false );
@@ -122,7 +127,7 @@ public class MessageTable extends JTable {
 		int column = getTagColumn( row, dm );
 		if( column < 0 ) return null;
 		String value = dm.getValueAt( row, column ).toString();
-		return new Integer(Integer.parseInt( value ));
+		return Integer.valueOf( value );
     }
     
     public String getValueFromPoint( Point point ) {

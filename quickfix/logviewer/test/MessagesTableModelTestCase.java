@@ -21,13 +21,14 @@ package quickfix.logviewer.test;
 
 import java.util.ArrayList;
 
+import junit.framework.TestCase;
 import quickfix.DataDictionary;
+import quickfix.Message;
 import quickfix.logviewer.FieldFilter;
 import quickfix.logviewer.LogFile;
 import quickfix.logviewer.MessagesTableModel;
 import quickfix.logviewer.ProgressBar;
 import quickfix.logviewer.ProgressBarPanel;
-import junit.framework.TestCase;
 
 public class MessagesTableModelTestCase extends TestCase {
 	private DataDictionary dataDictionary = null;
@@ -40,7 +41,7 @@ public class MessagesTableModelTestCase extends TestCase {
 	
 	public void testSetMessages() throws Exception {
 		LogFile logFile = new LogFile( "test.log", dataDictionary );
-		ArrayList messages = logFile.parseMessages( progressBar, null, null );
+		ArrayList<Message> messages = logFile.parseMessages( progressBar, null, null );
 		MessagesTableModel tableModel = new MessagesTableModel( dataDictionary );
 		tableModel.setMessages( messages, progressBar );
 		
@@ -66,11 +67,11 @@ public class MessagesTableModelTestCase extends TestCase {
 	
 	public void testFilter() throws Exception {
 		LogFile logFile = new LogFile( "test.log", dataDictionary );
-		ArrayList messages = logFile.parseMessages( progressBar, null, null );
+		ArrayList<Message> messages = logFile.parseMessages( progressBar, null, null );
 		MessagesTableModel tableModel = new MessagesTableModel( dataDictionary );
 		tableModel.setMessages( messages, progressBar );
 		
-		ArrayList filter = new ArrayList();
+		ArrayList<FieldFilter> filter = new ArrayList<FieldFilter> ();
 		filter.add( new FieldFilter(new quickfix.StringField(9, "52"), FieldFilter.EQUAL ));
 		tableModel.filter( filter );
 		assertEquals( "52", tableModel.getValueAt(0,1) );
@@ -79,7 +80,7 @@ public class MessagesTableModelTestCase extends TestCase {
 		assertEquals( "52", tableModel.getValueAt(3,1) );
 		assertEquals( "52", tableModel.getValueAt(4,1) );
 		
-		filter = new ArrayList();
+		filter = new ArrayList<FieldFilter> ();
 		filter.add( new FieldFilter(new quickfix.StringField(55, "DELL"), FieldFilter.EQUAL ));
 		tableModel.filter( filter );
 		assertEquals( "DELL", tableModel.getValueAt(0,23) );

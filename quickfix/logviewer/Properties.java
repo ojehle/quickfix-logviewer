@@ -21,6 +21,10 @@ package quickfix.logviewer;
 
 public class Properties extends java.util.Properties {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	final static int MAJOR_VERSION = 1;
 	final static int MINOR_VERSION = 1;
 	final static int REVISION = 1;

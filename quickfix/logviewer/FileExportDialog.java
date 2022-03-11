@@ -13,6 +13,11 @@ import javax.swing.JFrame;
 
 public class FileExportDialog extends Dialog implements ActionListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private JFileChooser fileChooser = new JFileChooser();
 
 	private static String path = System.getProperty("user.dir");

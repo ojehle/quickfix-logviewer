@@ -31,13 +31,13 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -45,9 +45,13 @@ import quickfix.DataDictionary;
 import quickfix.StringField;
 
 public class CustomFilterDialog extends Dialog implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ButtonPanel buttonPanel = new ButtonPanel();
-	private ArrayList filterPanels = new ArrayList();
-	private ArrayList filter = null;
+	private ArrayList <FilterPanel> filterPanels = new ArrayList<FilterPanel>();
+	private ArrayList <FieldFilter> filter = null;
 	
 	class ComboBoxItem extends Object {
 		private Integer tag = null;
@@ -63,7 +67,12 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 		}
 	}
 	
-	class OperatorComboBox extends JComboBox {
+	class OperatorComboBox extends JComboBox<String> {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		OperatorComboBox() {
 			this.addItem( "=" );
 			this.addItem( "!=" );
@@ -76,12 +85,16 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 	}
 	
 	class FilterPanel extends JPanel implements ChangeListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private JCheckBox checkBox = new JCheckBox();
-		private JComboBox comboBox = new JComboBox();
-		private JComboBox operatorComboBox = new OperatorComboBox();
+		private JComboBox <ComboBoxItem>comboBox = new JComboBox<ComboBoxItem>();
+		private OperatorComboBox  operatorComboBox = new OperatorComboBox();
 		private JTextField textField = new JTextField();
 				
-		FilterPanel( SortedSet tags, DataDictionary dataDictionary ) {
+		FilterPanel( SortedSet<Integer>  tags, DataDictionary dataDictionary ) {
 			
 			setLayout( new FlowLayout() );
 			enablePanel( false );
@@ -96,8 +109,8 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 			add( textField );
 			add( new JLabel() );
 			
-			TreeSet sortedTags = new TreeSet(tags);
-			Iterator i = sortedTags.iterator();
+			TreeSet<Integer> sortedTags = new TreeSet<Integer> (tags);
+			Iterator<Integer>  i = sortedTags.iterator();
 			while( i.hasNext() ) {
 				comboBox.addItem( new ComboBoxItem((Integer)i.next(), dataDictionary ));
 			}
@@ -128,6 +141,10 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 	}
 	
 	class ButtonPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private JButton cancel = new JButton("Cancel");
 		private JButton apply = new JButton("Apply");
 		
@@ -140,7 +157,7 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 		}
 	}
 	
-	public CustomFilterDialog(JFrame owner, ArrayList filter, SortedSet tags, DataDictionary dataDictionary) throws HeadlessException {
+	public CustomFilterDialog(JFrame owner, ArrayList <FieldFilter>filter, SortedSet<Integer>  tags, DataDictionary dataDictionary) throws HeadlessException {
 		super(owner, "Custom Filter");
 		
 		int rows = 10;
@@ -183,8 +200,8 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 			setVisible( false );
 			filter = null;
 		} else if( e.getSource() == buttonPanel.apply ) {
-			filter = new ArrayList();
-			Iterator i = filterPanels.iterator();
+			filter = new ArrayList<FieldFilter>();
+			Iterator<FilterPanel> i = filterPanels.iterator();
 			while( i.hasNext() ) {
 				FilterPanel filterPanel = (FilterPanel)i.next();
 				if( filterPanel.checkBox.isSelected() ) {
@@ -219,7 +236,7 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 		return FieldFilter.CONTAINS;
 	}
 		
-	public ArrayList getFilter() {
+	public ArrayList<FieldFilter> getFilter() {
 		return filter;
 	}
 }
