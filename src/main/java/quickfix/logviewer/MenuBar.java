@@ -25,6 +25,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -91,8 +92,12 @@ public class MenuBar extends javax.swing.JMenuBar implements ActionListener {
 	private JCheckBoxMenuItem currentViewSource = filterAllMessages;
 	private JCheckBoxMenuItem previousViewSource = filterAllMessages;
 
+	private JMenu filtersMenu = new JMenu("Custom Filters");
+
 	private JMenu helpMenu = new JMenu("Help");
 	public static final JMenuItem helpAbout = new JMenuItem("About");
+
+	private SplitPane splitPane = null;
 
 	ArrayList<ActionListener> actionListeners = new ArrayList<ActionListener>();
 
@@ -154,6 +159,9 @@ public class MenuBar extends javax.swing.JMenuBar implements ActionListener {
 		add(filterMenu);
 
 		helpMenu.add(helpAbout);
+		add(filtersMenu);
+		loadCustomFilter();
+
 		add(helpMenu);
 
 		reset();
@@ -173,12 +181,25 @@ public class MenuBar extends javax.swing.JMenuBar implements ActionListener {
 		fileExportMenu.setEnabled(value);
 		viewExportMenu.setEnabled(value);
 		fileClose.setEnabled(value);
+		filtersMenu.setEnabled(value);
 	}
 
 	public void customFilter() {
 		previousViewSource = currentViewSource;
 		currentViewSource = filterCustomFilter;
 		setSelectedFilter(currentViewSource);
+	}
+
+	public void loadCustomFilter() {
+		filtersMenu.removeAll();
+		filtersMenu.setEnabled(false);
+		File f = CustomFilterDialog.getFilterDir();
+		for (File c : f.listFiles()) {
+			JMenuItem m = new JMenuItem();
+			m.setText(c.getName());
+			m.addActionListener(this);
+			filtersMenu.add(m);
+		}
 	}
 
 	public void addActionListener(ActionListener l) {
@@ -208,6 +229,10 @@ public class MenuBar extends javax.swing.JMenuBar implements ActionListener {
 		}
 	}
 
+	public void registerSplitPane(SplitPane s) {
+		splitPane = s;
+	}
+
 	public void undo() {
 		setSelectedFilter(previousViewSource);
 	}
@@ -215,13 +240,29 @@ public class MenuBar extends javax.swing.JMenuBar implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		try {
 			previousViewSource = currentViewSource;
-			JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
-			currentViewSource = source;
-			setSelectedFilter(source);
+			Object s = e.getSource();
+			if (s instanceof JCheckBoxMenuItem) {
+
+				JCheckBoxMenuItem source = (JCheckBoxMenuItem) s;
+				currentViewSource = source;
+				setSelectedFilter(source);
+			}
+			if (s instanceof JMenuItem) {
+				JMenuItem source = (JMenuItem) s;
+				Component[] ca = filtersMenu.getMenuComponents();
+
+				for (Component c : ca) {
+					if (c.equals(source)) {
+						splitPane.applyFilter(source.getActionCommand());
+						setSelectedFilter(filterCustomFilter);
+						return;
+					}
+				}
+			}
 		} catch (ClassCastException cce) {
 		}
 
-		Iterator <ActionListener>i = actionListeners.iterator();
+		Iterator<ActionListener> i = actionListeners.iterator();
 		while (i.hasNext()) {
 			ActionListener actionListener = (ActionListener) i.next();
 			actionListener.actionPerformed(e);

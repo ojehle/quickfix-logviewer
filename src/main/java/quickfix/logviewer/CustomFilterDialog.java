@@ -181,7 +181,7 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 	}
 
 	public CustomFilterDialog(JFrame owner, ArrayList<FieldFilter> filter, SortedSet<Integer> tags,
-			DataDictionary dataDictionary) throws HeadlessException {
+			DataDictionary dataDictionary, String file) throws HeadlessException {
 		super(owner, "Custom Filter");
 
 		int rows = 10;
@@ -219,8 +219,12 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 		buttonPanel.apply.addActionListener(this);
 		buttonPanel.save.addActionListener(this);
 		buttonPanel.load.addActionListener(this);
-	}
 
+		if (file != null) {
+			loadFilterDialog(file);
+		}
+
+	}
 
 	private void loadFilter() {
 		/* reset all */
@@ -228,12 +232,12 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 		Iterator<FilterPanel> i = filterPanels.iterator();
 		while (i.hasNext()) {
 			FilterPanel filterPanel = (FilterPanel) i.next();
-			
+
 			filterPanel.comboBox.setSelectedIndex(-1);
 			filterPanel.operatorComboBox.setSelectedIndex(-1);
 			filterPanel.textField.setText("");
 		}
-		
+
 		if (filter == null)
 			return;
 
@@ -241,11 +245,11 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 
 		for (FieldFilter x : filter) {
 
-		 if (i.hasNext()) {
-			FilterPanel filterPanel = (FilterPanel) i.next();
+			if (i.hasNext()) {
+				FilterPanel filterPanel = (FilterPanel) i.next();
 				filterPanel.set(x);
-		 }
-		 }
+			}
+		}
 	}
 
 	private void saveFilter() {
@@ -266,7 +270,7 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == buttonPanel.load) {
-			loadFilterDialog();
+			loadFilterDialog(null);
 			loadFilter();
 			return;
 		}
@@ -326,27 +330,40 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 		return filter;
 	}
 
-	public void loadFilterDialog() {
+	public static File getFilterDir() {
 		File f;
 		f = FileSystemView.getFileSystemView().getHomeDirectory();
 		f = new File(f, ".quickfix-logviewer");
 		if (!f.exists())
 			f.mkdir();
+		return f;
+	}
 
-		JFileChooser jfc = new JFileChooser(f);
-		jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		int returnValue = jfc.showOpenDialog(null);
+	public void loadFilterDialog(String file) {
+		File f;
+		f = getFilterDir();
 
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			f = jfc.getSelectedFile();
-		} else
-			return;
+		if (file == null) {
+			JFileChooser jfc = new JFileChooser(f);
+			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int returnValue = jfc.showOpenDialog(null);
+
+			if (returnValue == JFileChooser.APPROVE_OPTION) {
+				f = jfc.getSelectedFile();
+			} else
+				return;
+
+		} else {
+			f = new File(f, file);
+			if (!f.exists())
+				return;
+		}
 
 		try {
 			String l = null;
 			if (filter != null) {
 				filter.clear();
-			}else {
+			} else {
 				filter = new ArrayList<FieldFilter>();
 			}
 			BufferedReader br = new BufferedReader(new FileReader(f));
@@ -368,10 +385,7 @@ public class CustomFilterDialog extends Dialog implements ActionListener {
 
 	public void saveFilterDialog() {
 		File f;
-		f = FileSystemView.getFileSystemView().getHomeDirectory();
-		f = new File(f, ".quickfix-logviewer");
-		if (!f.exists())
-			f.mkdir();
+		f = getFilterDir();
 
 		JFileChooser jfc = new JFileChooser(f);
 		jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);

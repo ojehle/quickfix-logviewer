@@ -18,6 +18,7 @@
 ****************************************************************************/
 
 package quickfix.logviewer;
+
 import java.awt.BorderLayout;
 import java.awt.HeadlessException;
 
@@ -27,41 +28,38 @@ import javax.swing.JTabbedPane;
 import quickfix.DataDictionary;
 
 public class Frame extends JFrame {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private MenuBar menuBar = new MenuBar();
 
-	public Frame( DataDictionary dataDictionary ) throws HeadlessException {
-		super();		
-		
-		ProgressBarPanel progressBarPanel = new ProgressBarPanel( new ProgressBar() );
-		MenuBar menuBar = new MenuBar();
-		setJMenuBar( menuBar );
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-		SplitPane pane = new SplitPane( 
-				this, 
-				progressBarPanel, 
-				new MessageTable(), new MessageTree(), 
-				new JTabbedPane(), new JTabbedPane(), 
-				dataDictionary );
-		
+	public Frame(DataDictionary dataDictionary) throws HeadlessException {
+		super();
+
+		ProgressBarPanel progressBarPanel = new ProgressBarPanel(new ProgressBar());
+
+		setJMenuBar(menuBar);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		SplitPane pane = new SplitPane(this, progressBarPanel, new MessageTable(), new MessageTree(), new JTabbedPane(),
+				new JTabbedPane(), dataDictionary);
+
 		pane.setDividerLocation(300);
-		
-        getContentPane().setLayout(new BorderLayout());
-		getContentPane().add( pane, BorderLayout.CENTER );
-		getContentPane().add( progressBarPanel, BorderLayout.PAGE_END );
-		setTitle( null );
-		setSize( 800, 600 );
-        fileLoaded( false );
-        menuBar.addActionListener(pane);
+
+		getContentPane().setLayout(new BorderLayout());
+		getContentPane().add(pane, BorderLayout.CENTER);
+		getContentPane().add(progressBarPanel, BorderLayout.PAGE_END);
+		setTitle(null);
+		setSize(800, 600);
+		fileLoaded(false);
+		menuBar.addActionListener(pane);
 	}
 
 	public void fileLoaded(boolean value) {
-		if( !value )
-			super.setTitle( "QuickFIX Log Viewer (no file loaded)" );
+		if (!value)
+			super.setTitle("QuickFIX Log Viewer (no file loaded)");
 		else
 			super.setTitle("QuickFIX Log Viewer");
 	}

@@ -74,6 +74,7 @@ public class SplitPane extends JSplitPane
 		
 		frame = aFrame;
 		menuBar = (MenuBar)aFrame.getJMenuBar();
+		menuBar.registerSplitPane(this);
 		progressBar = aProgressBar;
 		messageTable = aMessageTable;
 		messageTree = aMessageTree;
@@ -149,7 +150,8 @@ public class SplitPane extends JSplitPane
 		} else if( source == MenuBar.filterCollateralManagementCategory ) {
 			currentModel.viewCategory( Category.CollateralManagement );
 		} else if( source == MenuBar.filterCustomFilter ) {
-			applyFilter( null );
+			applyFilter( null,null  );
+				
 		} else if( source == MenuBar.helpAbout ) {
 			showAbout();
 		} else {
@@ -256,7 +258,17 @@ public class SplitPane extends JSplitPane
 		if( traceRunning ) tracer.start();
 	}
 	
-	private boolean applyFilter( FieldFilter fieldFilter ) {
+	public boolean applyFilter( String file) {
+		
+		return applyFilter(null,file);
+}
+	
+	public boolean applyFilter( FieldFilter fieldFilter) {
+	
+			return applyFilter(fieldFilter,null);
+	}
+	
+	public boolean applyFilter( FieldFilter fieldFilter , String file) {
 		if( currentModel == null )
 			return false;
 		
@@ -267,9 +279,11 @@ public class SplitPane extends JSplitPane
 			filter.add( fieldFilter );
 		
 		CustomFilterDialog dialog = 
-			new CustomFilterDialog( frame, filter, currentModel.getTags(), dataDictionary );
+			new CustomFilterDialog( frame, filter, currentModel.getTags(), dataDictionary, file );
 		
-		dialog.setVisible( true );
+		if (file == null) {
+			dialog.setVisible( true );
+	}
 		filter = dialog.getFilter();
 		if( filter != null ) {
 			currentModel.filter( filter );
