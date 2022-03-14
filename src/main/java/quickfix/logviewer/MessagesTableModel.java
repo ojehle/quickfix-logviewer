@@ -258,112 +258,138 @@ public class MessagesTableModel extends AbstractTableModel {
 
 	public void filter(ArrayList<FieldFilter> fields, ArrayList<Message> aMessages) {
 		filter = fields;
+
+		// same tags we filter as or
+
+		HashMap<Integer, ArrayList<FieldFilter>> filterMap = new HashMap<Integer, ArrayList<FieldFilter>>();
+		for (FieldFilter f : fields) {
+			Integer tag = Integer.valueOf(f.getTag());
+			ArrayList<FieldFilter> al = filterMap.get(tag);
+			if (al == null) {
+				al = new ArrayList<FieldFilter>();
+			}
+			al.add(f);
+			filterMap.put(tag, al);
+		}
+
 		if (aMessages == allMessages)
 			filterMessages.clear();
 		Iterator<Message> i = aMessages.iterator();
 
 		while (i.hasNext()) {
 			boolean addMessage = true;
+			boolean filterHit = true;
 			Message message = (Message) i.next();
-			Iterator<FieldFilter> j = fields.iterator();
-			while (j.hasNext()) {
-				FieldFilter fieldFilter = (FieldFilter) j.next();
-				int tag = fieldFilter.getTag();
-				StringField field = new StringField(tag, "");
-				try {
-					if (dataDictionary.isHeaderField(tag))
-						message.getHeader().getField(field);
-					else if (dataDictionary.isTrailerField(tag))
-						message.getTrailer().getField(field);
-					else
-						message.getField(field);
+			Iterator<Integer> ktag = filterMap.keySet().iterator();
+			while (ktag.hasNext()) {
+				filterHit = false;
+				ArrayList<FieldFilter> al =filterMap.get(ktag.next());
+				Iterator<FieldFilter> j = al.iterator();
+				while (j.hasNext()) {
+					FieldFilter fieldFilter = (FieldFilter) j.next();
+					int tag = fieldFilter.getTag();
+					StringField field = new StringField(tag, "");
+					try {
+						if (dataDictionary.isHeaderField(tag))
+							message.getHeader().getField(field);
+						else if (dataDictionary.isTrailerField(tag))
+							message.getTrailer().getField(field);
+						else
+							message.getField(field);
 
-					int operator = fieldFilter.getOperator();
-					int compareResults = 0;
-					String value1 = field.getValue();
-					String value2 = fieldFilter.getValue();
-			
-					int fieldType = dataDictionary.getFieldType(tag).ordinal();
+						int operator = fieldFilter.getOperator();
+						int compareResults = 0;
+						String value1 = field.getValue();
+						String value2 = fieldFilter.getValue();
 
-					switch (fieldType) {
-					// doubles
-					case 3:
-					case 5:
-					case 6:
-					case 14:
-					case 15:
-					case 22:
-						try {
-							Double doubleValue1 = Double.valueOf(value1);
-							Double doubleValue2 = Double.valueOf(value2);
-							compareResults = doubleValue1.compareTo(doubleValue2);
-						} catch (NumberFormatException e) {
-							addMessage = false;
+						int fieldType = dataDictionary.getFieldType(tag).ordinal();
+
+						switch (fieldType) {
+						// doubles
+						case 3:
+						case 5:
+						case 6:
+						case 14:
+						case 15:
+						case 22:
+							try {
+								Double doubleValue1 = Double.valueOf(value1);
+								Double doubleValue2 = Double.valueOf(value2);
+								compareResults = doubleValue1.compareTo(doubleValue2);
+							} catch (NumberFormatException e) {
+								addMessage = false;
+							}
+							break;
+						// integers
+						case 4:
+						case 21:
+						case 23:
+						case 24:
+							try {
+								Integer integerValue1 = Integer.valueOf(value1);
+								Integer integerValue2 = Integer.valueOf(value2);
+								compareResults = integerValue1.compareTo(integerValue2);
+							} catch (NumberFormatException e) {
+								addMessage = false;
+							}
+							break;
+						default:
+							compareResults = value1.compareTo(value2);
 						}
-						break;
-					// integers
-					case 4:
-					case 21:
-					case 23:
-					case 24:
-						try {
-							Integer integerValue1 = Integer.valueOf(value1);
-							Integer integerValue2 = Integer.valueOf(value2);
-							compareResults = integerValue1.compareTo(integerValue2);
-						} catch (NumberFormatException e) {
-							addMessage = false;
+
+						if (compareResults != 0) {
+							String value1Name = dataDictionary.getValueName(tag, value1);
+							if (value1Name != null)
+								compareResults = value1Name.toUpperCase().compareTo(value2.toUpperCase());
 						}
-						break;
-					default:
-						compareResults = value1.compareTo(value2);
-					}
 
-					if (compareResults != 0) {
-						String value1Name = dataDictionary.getValueName(tag, value1);
-						if (value1Name != null)
-							compareResults = value1Name.toUpperCase().compareTo(value2.toUpperCase());
-					}
+						if (operator == FieldFilter.CONTAINS) {
+							compareResults = value1.indexOf(value2);
+						}
 
-					if (operator == FieldFilter.CONTAINS) {
-						compareResults = value1.indexOf(value2);
+						switch (operator) {
+						case FieldFilter.EQUAL:
+							if (compareResults == 0)
+								filterHit = true;
+							break;
+						case FieldFilter.NOT_EQUAL:
+							if (compareResults == 0)
+								filterHit = true;
+							break;
+						case FieldFilter.LESS_THAN:
+							if (compareResults < 0)
+								filterHit = true;
+							break;
+						case FieldFilter.LESS_THAN_OR_EQUAL:
+							if (compareResults <= 0)
+								filterHit = true;
+							break;
+						case FieldFilter.GREATER_THAN:
+							if (compareResults > 0)
+								filterHit = true;
+							break;
+						case FieldFilter.GREATER_THAN_OR_EQUAL:
+							if (compareResults >= 0)
+								filterHit = true;
+							break;
+						case FieldFilter.CONTAINS:
+							if (compareResults != -1)
+								filterHit = true;
+							break;
+						}
+					} catch (FieldNotFound e) {
 					}
-
-					switch (operator) {
-					case FieldFilter.EQUAL:
-						if (!(compareResults == 0))
-							addMessage = false;
-						break;
-					case FieldFilter.NOT_EQUAL:
-						if (!(compareResults != 0))
-							addMessage = false;
-						break;
-					case FieldFilter.LESS_THAN:
-						if (!(compareResults < 0))
-							addMessage = false;
-						break;
-					case FieldFilter.LESS_THAN_OR_EQUAL:
-						if (!(compareResults <= 0))
-							addMessage = false;
-						break;
-					case FieldFilter.GREATER_THAN:
-						if (!(compareResults > 0))
-							addMessage = false;
-						break;
-					case FieldFilter.GREATER_THAN_OR_EQUAL:
-						if (!(compareResults >= 0))
-							addMessage = false;
-						break;
-					case FieldFilter.CONTAINS:
-						if (compareResults == -1)
-							addMessage = false;
-						break;
-					}
-				} catch (FieldNotFound e) {
+				
+				}
+				if (!filterHit) {
 					addMessage = false;
+					break;
 				}
 			}
 			if (addMessage)
 				filterMessages.add(message);
+		
+			addMessage = true;
 		}
 		messages = filterMessages;
 		fireTableStructureChanged();
