@@ -19,7 +19,7 @@
 
 package quickfix.logviewer;
 
-import quickfix.StringField;
+import quickfix.Field;
 
 public class FieldFilter {
 
@@ -31,15 +31,15 @@ public class FieldFilter {
 	public final static int GREATER_THAN_OR_EQUAL = 5;
 	public final static int CONTAINS = 6;
 
-	private StringField field = null;
+	private Field<?> field = null;
 	private int operator = 0;
 	
-	public FieldFilter( StringField aField, int aOperator ) {
+	public FieldFilter( Field<?> aField, int aOperator ) {
 		field = aField;
 		operator = aOperator;
 	}
 
-	public StringField getField() {
+	public Field<?> getField() {
 		return field;
 	}
 	
@@ -48,10 +48,21 @@ public class FieldFilter {
 	}
 
 	public String getValue() {
-		return field.getValue();
+		return field.getObject().toString();
 	}
 	
 	public int getOperator() {
 		return operator;
+	}
+	
+	public String toString()
+	{
+		StringBuffer b = new StringBuffer(64);
+		b.append(getTag());
+		b.append("=");
+		b.append(getValue());
+		b.append("=");
+		b.append(operator);
+		return b.toString();
 	}
 }
